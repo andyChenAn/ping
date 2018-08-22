@@ -1,0 +1,12 @@
+{
+  "name": "ping",
+  "version": "1.0.0",
+  "description": "web服务器",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "andychen",
+  "license": "ISC"
+}
