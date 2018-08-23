@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('./mime.js');
 const config = require('./config.js');
-const util = require('./util');
 const zlib = require('zlib');
 
 function Asset () {
@@ -42,27 +41,43 @@ Asset.prototype.dispatch = function (request , response) {
                     // 获取文件的后缀名
                     let ext = path.extname(realPath).slice(1);
                     ext = ext ? ext : 'unknow';
-                    let contentType = mime.types[ext] ? mime.types[ext] : 'text/plain';
+                    let contentType = mime.types[ext] || 'text/plain';
                     response.setHeader('Content-Type' , contentType);
                     let lastModified = stats.mtime.toUTCString();
-                    let IfModifiedSince = 'If-Modified-Since'.toLowerCase();
+                    let ifModifiedSince = 'If-Modified-Since'.toLowerCase();
+                    response.setHeader('Last-Modified' , lastModified);
                     // 设置缓存
                     if (ext.match(config.expires.fileMatch)) {
+                        console.log(ext)
                         let expires = new Date();
                         expires.setTime(expires.getTime() + config.expires.maxAge * 1000);
-                        response.setHeader('expires' , expires.toUTCString());
+                        response.setHeader('Expires' , expires.toUTCString());
                         response.setHeader('Cache-Control' , 'max-age=' + config.expires.maxAge);
                     };
                     // 判断文件修改的时间是否和上一次修改的时间一样，如果一样就直接返回数据
                     // 协商缓存
-                    if (request.headers['ifModifiedSince'] && request.headers['ifModifiedSince'] == lastModified) {
+                    if (request.headers[ifModifiedSince] && request.headers[ifModifiedSince] == lastModified) {
                         response.writeHead(304 , 'Not Modified');
                         response.end();
                     } else {
+                        // 服务器发送数据到客户端
+                        let compressHandle = function (raw , statusCode , reasonPhrase , contentLength) {
+                            let stream = raw;
+                            let acceptEncoding = request.headers['accept-encoding'] || '';
+                            let matched = ext.match(config.compress.match);
+                            if (matched && acceptEncoding.match(/\bgzip\b/)) {
+                                response.setHeader('Content-Encoding' , 'gzip');
+                                stream = raw.pipe(zlib.createGzip());
+                            } else if (matched && acceptEncoding.match(/\bdeflate\b/)) {
+                                response.setHeader('Content-Encoding' , 'deflate');
+                                stream = raw.pipe(zlib.createDeflate());
+                            };
+                            response.setHeader('Content-Length' , contentLength);
+                            response.writeHead(statusCode , reasonPhrase);
+                            stream.pipe(response);
+                        };
                         let raw = fs.createReadStream(realPath);
-                        response.setHeader('Content-Length' , stats.size);
-                        response.writeHead(200 , 'ok');
-                        raw.pipe(response);
+                        compressHandle(raw , 200 , 'ok' , stats.size);
                     }
                 }
             }
