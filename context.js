@@ -44,7 +44,7 @@ Context.prototype._renderView = function (viewEngine , template , data) {
         response = this.response;
         try {
             response.writeHead(200 , 'ok' , {'Content-Type' : 'text/html;charset=utf-8'});
-            response.write(viewEngine.template(template , data));
+            response.write(template);
             response.end();
         } catch (e) {
             console.log(e.message);
