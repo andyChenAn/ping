@@ -8,4 +8,5 @@ exports.expires = {
 };
 exports.compress = {
     match : /css|html/gi
-}
+};
+exports.timeout = 1 * 60 * 1000;

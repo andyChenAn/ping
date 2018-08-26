@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "andychen",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "footprint": "^1.1.0"
+  }
 }
