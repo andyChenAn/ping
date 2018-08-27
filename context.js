@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const footprint = require('footprint');
+const aa = require('./template.js');
 function Context (request , response , session , framework) {
     this.request = request;
     this.response = response;
@@ -63,7 +63,7 @@ Context.prototype.renderView = function (view , data) {
         response = this.response,
         framework = this.framework;
     
-    let viewEngine  = footprint;
+    let viewEngine  = aa;
 
     viewEngine._cache = viewEngine._cahce || {};
     let template = viewEngine._cache[view];
@@ -87,5 +87,5 @@ Context.prototype.renderView = function (view , data) {
         })
     }
 };
-Context.prototype.renderPartial = Context.prototype.renderView;
+Context.prototype.renderView;
 exports.Context = Context;

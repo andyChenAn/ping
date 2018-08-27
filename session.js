@@ -42,7 +42,6 @@ class SessionManager {
     renew (response) {
         let sessionId = new Date().getTime() + Math.round(Math.random() * 1000);
         let session = new Session(sessionId);
-        console.log(session)
         session.updateTime();
         let expires = 10 * 60 * 1000;
         let cookie = {key : SESSION_KEY , value : sessionId , expires : expires , domain : '/' , path : '/'};

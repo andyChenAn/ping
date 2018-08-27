@@ -16,6 +16,12 @@ get.redirect = function () {
     this.redirect('https://github.com/');
 };
 get.render = function () {
-    let obj = {title : 'nodejs'};
+    var obj = {
+        show : false,
+        name : 'andy',
+        age : 22,
+        address : '广州1',
+        list : [1,2,3,4]
+    };
     this.renderView('index.html' , obj);
 };
